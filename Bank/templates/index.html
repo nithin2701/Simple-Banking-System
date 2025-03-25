@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Banking Dashboard</title>
+    <link rel="icon" href="https://pgc.mahajana.edu.in/wp-content/uploads/2020/11/Mahajana-logo-DIH.jpg" type="image/icon">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Poppins", sans-serif;
+            text-decoration: none;
+            list-style: none;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            color: #333;
+            min-height: 100vh;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #555;
+            font-size: 14px;
+            margin-top: 100px;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+.copyright {
+    font-weight: 500;
+}
+
+.container {
+    flex: 1;
+}
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .welcome {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .welcome h1 {
+            font-size: 28px;
+            color: #333;
+        }
+
+        .account-info {
+            margin-top: 5px;
+            font-size: 16px;
+            color: #666;
+        }
+
+        .logout-btn {
+            background: #f44336;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: #d32f2f;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 250px;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-icon {
+            font-size: 50px;
+            margin-bottom: 15px;
+            color: #7494ec;
+        }
+
+        .card h2 {
+            font-size: 22px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .card p {
+            color: #666;
+            margin-bottom: 20px;
+            flex-grow: 1;
+        }
+
+        .card-btn {
+            display: inline-block;
+            background: #7494ec;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: background 0.3s;
+            width: 100%;
+        }
+
+        .card-btn:hover {
+            background: #5a7cd8;
+        }
+
+        .flash-messages {
+            width: 100%;
+            margin: 20px 0;
+            padding: 15px;
+            text-align: center;
+            border-radius: 8px;
+            font-weight: 500;
+            word-wrap: break-word;
+            box-sizing: border-box;
+            transition: opacity 0.5s ease-out;
+        }
+
+        .success {
+            color: #155724;
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error {
+            color: #721c24;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+            }
+        }
+        
+        .fade-out {
+            animation: fadeOut 0.5s ease-out forwards;
+        }
+
+        /* Icons using CSS */
+        .icon-balance::before {
+            content: "💰";
+        }
+        .icon-transaction::before {
+            content: "💸";
+        }
+        .icon-history::before {
+            content: "📊";
+        }
+        .icon-logout::before {
+            content: "🔒";
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="welcome">
+                <h1>Welcome, {{ session.username }}!</h1>
+                <div class="account-info">Account ID: <strong>{{ session.account_id }}</strong></div>
+            </div>
+            <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-messages {{ category }}" id="flash-container">
+                        <p>{{ message }}</p>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="dashboard">
+            <div class="card">
+                <div>
+                    <div class="card-icon icon-balance"></div>
+                    <h2>Check Balance</h2>
+                    <p>View your current account balance and financial status.</p>
+                </div>
+                <a href="{{ url_for('balance') }}" class="card-btn">View Balance</a>
+            </div>
+
+            <div class="card">
+                <div>
+                    <div class="card-icon icon-transaction"></div>
+                    <h2>Make Transaction</h2>
+                    <p>Deposit or withdraw funds from your account securely.</p>
+                </div>
+                <a href="{{ url_for('transaction') }}" class="card-btn">New Transaction</a>
+            </div>
+
+            <div class="card">
+                <div>
+                    <div class="card-icon icon-history"></div>
+                    <h2>Transaction History</h2>
+                    <p>View your complete transaction history and activity.</p>
+                </div>
+                <a href="{{ url_for('history') }}" class="card-btn">View History</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p class="copyright">Copyright © 2025 Nithin B L. All rights reserved.</p>
+    </div>
+
+    <script>
+        // Wait for DOM to be fully loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            const flashContainer = document.getElementById('flash-container');
+            
+            if (flashContainer) {
+                // Set a timeout to fade out flash messages after 3 seconds
+                setTimeout(() => {
+                    flashContainer.classList.add('fade-out');
+                    
+                    // Remove the flash messages container after animation completes
+                    flashContainer.addEventListener('animationend', () => {
+                        flashContainer.remove();
+                    }, { once: true });
+                }, 3000);
+            }
+        });
+    </script>
+</body>
+</html>

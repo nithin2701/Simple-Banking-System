@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Transaction History</title>
+    <link rel="icon" href="https://pgc.mahajana.edu.in/wp-content/uploads/2020/11/Mahajana-logo-DIH.jpg" type="image/icon">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Poppins", sans-serif;
+            text-decoration: none;
+            list-style: none;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+        }
+
+        .container {
+            position: relative;
+            width: 850px;
+            min-height: 400px;
+            background: #fff;
+            margin: 20px;
+            border-radius: 30px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, .2);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+        }
+
+        .history-box {
+            width: 100%;
+            text-align: center;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+
+        .account-info {
+            margin-bottom: 20px;
+            font-size: 18px;
+            color: #555;
+        }
+
+        .btn {
+            width: 200px;
+            height: 48px;
+            background: #7494ec;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, .1);
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            color: #fff;
+            font-weight: 600;
+            margin-top: 20px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn:hover {
+            background: #5a7cd8;
+        }
+
+        .refresh-btn {
+            background: #6c757d;
+            margin-right: 10px;
+        }
+        
+        .refresh-btn:hover {
+            background: #5a6268;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+
+        .flash-messages {
+            width: 100%;
+            margin-top: 15px;
+            padding: 10px;
+            text-align: center;
+            color: #721c24;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 8px;
+            font-weight: 500;
+            word-wrap: break-word;
+            overflow: hidden;
+            box-sizing: border-box;
+            transition: opacity 0.5s ease-out;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, .05);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            color: #495057;
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #e9ecef;
+        }
+
+        .deposit {
+            color: #28a745;
+            font-weight: 600;
+        }
+
+        .withdraw {
+            color: #dc3545;
+            font-weight: 600;
+        }
+
+        .no-transactions {
+            margin: 30px 0;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            color: #6c757d;
+            font-size: 18px;
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+            }
+        }
+        
+        .fade-out {
+            animation: fadeOut 0.5s ease-out forwards;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="history-box">
+            <h1>Transaction History</h1>
+            
+            <div class="account-info">
+                Account ID: <strong>{{ account_id }}</strong>
+            </div>
+            
+            {% if transactions %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Transaction Type</th>
+                            <th>Amount</th>
+                            <th>Date & Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for transaction in transactions %}
+                            <tr>
+                                <td class="{{ transaction[0] }}">{{ transaction[0]|capitalize }}</td>
+                                <td>${{ "%.2f"|format(transaction[1]) }}</td>
+                                <td>{{ transaction[2] }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="no-transactions">
+                    No transaction history found for this account.
+                </div>
+            {% endif %}
+            
+            <div class="button-group">
+                <a href="{{ url_for('history') }}" class="btn refresh-btn">Refresh History</a>
+                <a href="{{ url_for('index') }}" class="btn">Back to Home</a>
+            </div>
+            
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <div class="flash-messages" id="flash-container">
+                        {% for message in messages %}
+                            <p>{{ message }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+        </div>
+    </div>
+
+
+    <script>
+        // Wait for DOM to be fully loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            const flashContainer = document.getElementById('flash-container');
+            
+            if (flashContainer) {
+                // Set a timeout to fade out flash messages after 3 seconds
+                setTimeout(() => {
+                    flashContainer.classList.add('fade-out');
+                    
+                    // Remove the flash messages container after animation completes
+                    flashContainer.addEventListener('animationend', () => {
+                        flashContainer.remove();
+                    }, { once: true });
+                }, 3000);
+            }
+        });
+    </script>
+</body>
+</html>
